@@ -1,16 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, send_file
+from flask import Flask, render_template, request, redirect, session
 from supabase import create_client
-import os
-
-from admin import admin_bp
-from certificate import generate_certificate
 
 app = Flask(__name__)
 app.secret_key = "secretkey123"
 
-app.register_blueprint(admin_bp, url_prefix="/admin")
-
-# ---------------- SUPABASE SETUP ----------------
+# ---------------- SUPABASE ----------------
 SUPABASE_URL = "https://kofuudhozedguvbuxpcl.supabase.co"
 SUPABASE_KEY = "sb_publishable_pf0MofvYYw-OSyDiGXj5Pw_FhcE_J3g"
 
@@ -99,35 +93,19 @@ def submit():
         remark=remark
     )
 
-# ---------------- CERTIFICATE ----------------
-from flask import send_file, session
-import io
-
+# ---------------- SIMPLE CERTIFICATE (SAFE) ----------------
 @app.route("/certificate")
 def certificate():
     user = session.get("user", "Student")
     score = session.get("last_score", 0)
     total = session.get("total", 0)
 
-    # TEMP SAFE RESPONSE (no file system crash)
-    content = f"""
-    Certificate of Completion
-
-    Student: {user}
-    Score: {score}/{total}
+    return f"""
+    <h2>Certificate</h2>
+    <p>Student: {user}</p>
+    <p>Score: {score}/{total}</p>
+    <p>Thank you for completing the quiz!</p>
     """
-
-    # create in-memory file (Vercel safe)
-    buffer = io.BytesIO()
-    buffer.write(content.encode())
-    buffer.seek(0)
-
-    return send_file(
-        buffer,
-        as_attachment=True,
-        download_name="certificate.txt",
-        mimetype="text/plain"
-    )
 
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
@@ -135,4 +113,5 @@ def logout():
     session.clear()
     return redirect("/login")
 
+# ---------------- VERCEL ENTRY ----------------
 app = app
