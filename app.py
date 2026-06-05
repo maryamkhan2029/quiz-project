@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, send_file
-import sqlite3
+from supabase import create_client
 import os
 
 from admin import admin_bp
@@ -10,17 +10,16 @@ app.secret_key = "secretkey123"
 
 app.register_blueprint(admin_bp, url_prefix="/admin")
 
-# ---------------- DATABASE PATH FIX ----------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database.db")
-QUIZ_DB = os.path.join(BASE_DIR, "quiz.db")
+# ---------------- SUPABASE SETUP ----------------
+SUPABASE_URL = "https://kofuudhozedguvbuxpcl.supabase.co"
+SUPABASE_KEY = "sb_publishable_pf0MofvYYw-OSyDiGXj5Pw_FhcE_J3g"
 
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------- HOME ----------------
 @app.route("/")
 def home():
     return redirect("/login")
-
 
 # ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
@@ -29,16 +28,14 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (username, password))
-        conn.commit()
-        conn.close()
+        supabase.table("users").insert({
+            "username": username,
+            "password": password
+        }).execute()
 
         return redirect("/login")
 
     return render_template("register.html")
-
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
@@ -47,13 +44,13 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
-        user = c.fetchone()
-        conn.close()
+        user = supabase.table("users") \
+            .select("*") \
+            .eq("username", username) \
+            .eq("password", password) \
+            .execute()
 
-        if user:
+        if user.data:
             session["user"] = username
             return redirect("/quiz")
 
@@ -61,36 +58,28 @@ def login():
 
     return render_template("login.html")
 
-
 # ---------------- QUIZ ----------------
 @app.route("/quiz")
 def quiz():
-    conn = sqlite3.connect(QUIZ_DB)
-    c = conn.cursor()
-    c.execute("SELECT * FROM questions")
-    questions = c.fetchall()
-    conn.close()
+    data = supabase.table("questions").select("*").execute()
+    questions = data.data
 
     return render_template("quiz.html", questions=questions)
-
 
 # ---------------- SUBMIT ----------------
 @app.route("/submit", methods=["POST"])
 def submit():
-    conn = sqlite3.connect(QUIZ_DB)
-    c = conn.cursor()
-    c.execute("SELECT * FROM questions")
-    data = c.fetchall()
-    conn.close()
+    data = supabase.table("questions").select("*").execute()
+    questions = data.data
 
     score = 0
 
-    for i, q in enumerate(data):
+    for i, q in enumerate(questions):
         user_answer = request.form.get(str(i))
-        if user_answer == q[6]:
+        if user_answer == q["correct"]:
             score += 1
 
-    total = len(data)
+    total = len(questions)
     wrong = total - score
     percentage = round((score / total) * 100, 2) if total > 0 else 0
 
@@ -110,7 +99,6 @@ def submit():
         remark=remark
     )
 
-
 # ---------------- CERTIFICATE ----------------
 @app.route("/certificate")
 def certificate():
@@ -122,12 +110,12 @@ def certificate():
 
     return send_file(file_path, as_attachment=True)
 
-
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
-
-# ❌ IMPORTANT: VERCEL COMPATIBLE (NO app.run)
+# ---------------- RUN ----------------
+if __name__ == "__main__":
+    app.run(debug=True)
