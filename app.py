@@ -61,46 +61,22 @@ def login():
 
 # ---------------- QUIZ ----------------
 @app.route("/quiz")
+@app.route("/quiz")
 def quiz():
     try:
         data = supabase.table("questions").select("*").execute()
-        questions = data.data
-        return str(questions)
+        return str(data.data)
     except Exception as e:
         return str(e)
 
 # ---------------- SUBMIT ----------------
 @app.route("/submit", methods=["POST"])
 def submit():
-    data = supabase.table("questions").select("*").execute()
-    questions = data.data
-
-    score = 0
-
-    for i, q in enumerate(questions):
-        user_answer = request.form.get(str(i))
-        if user_answer == q["correct"]:
-            score += 1
-
-    total = len(questions)
-    wrong = total - score
-    percentage = round((score / total) * 100, 2) if total > 0 else 0
-
-    status = "PASS" if percentage >= 50 else "FAIL"
-    remark = "Good Work" if percentage >= 50 else "Need Improvement"
-
-    session["last_score"] = score
-    session["total"] = total
-
-    return render_template(
-        "result.html",
-        score=score,
-        total=total,
-        wrong=wrong,
-        percentage=percentage,
-        status=status,
-        remark=remark
-    )
+    try:
+        data = supabase.table("questions").select("*").execute()
+        return str(data.data)
+    except Exception as e:
+        return str(e)
 
 # ---------------- SIMPLE CERTIFICATE (SAFE) ----------------
 @app.route("/certificate")
