@@ -1,9 +1,16 @@
 from flask import Flask, render_template, request, redirect, session
 from supabase import create_client
 
+try:
+    from supabase import create_client
+except:
+    create_client = None
 app = Flask(__name__)
 app.secret_key = "secretkey123"
 
+@app.route("/test")
+def test():
+    return "App is working fine"
 # ---------------- SUPABASE ----------------
 SUPABASE_URL = "https://kofuudhozedguvbuxpcl.supabase.co"
 SUPABASE_KEY = "sb_publishable_pf0MofvYYw-OSyDiGXj5Pw_FhcE_J3g"
@@ -55,10 +62,12 @@ def login():
 # ---------------- QUIZ ----------------
 @app.route("/quiz")
 def quiz():
-    data = supabase.table("questions").select("*").execute()
-    questions = data.data
-
-    return render_template("quiz.html", questions=questions)
+    try:
+        data = supabase.table("questions").select("*").execute()
+        questions = data.data
+        return str(questions)
+    except Exception as e:
+        return str(e)
 
 # ---------------- SUBMIT ----------------
 @app.route("/submit", methods=["POST"])
