@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(135deg,#6a11cb,#2575fc);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* Card */
+.card{
+    background:white;
+    width:350px;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.25);
+    text-align:center;
+}
+
+/* Heading */
+.card h2{
+    margin-bottom:20px;
+    color:#333;
+}
+
+/* Inputs */
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+    transition:0.3s;
+}
+
+input:focus{
+    border-color:#2575fc;
+    box-shadow:0 0 5px rgba(37,117,252,0.4);
+}
+
+/* Button */
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    color:white;
+    font-size:16px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+/* small text */
+p{
+    margin-top:15px;
+    font-size:14px;
+}
+
+a{
+    color:#2575fc;
+    text-decoration:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+    <h2>📝 Create Account</h2>
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Enter Username" required>
+        <input type="password" name="password" placeholder="Enter Password" required>
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="/login">Login</a></p>
+</div>
+
+</body>
+</html>

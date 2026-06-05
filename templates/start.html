@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Start Quiz</title>
+
+    <style>
+        body{
+            margin:0;
+            font-family:Arial;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background: linear-gradient(135deg,#1f4037,#99f2c8);
+        }
+
+        .box{
+            background:white;
+            padding:40px;
+            border-radius:20px;
+            text-align:center;
+            width:320px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            margin-bottom:10px;
+            color:#1f4037;
+        }
+
+        p{
+            color:gray;
+            margin-bottom:20px;
+        }
+
+        button{
+            padding:12px 20px;
+            background:#1f4037;
+            border:none;
+            color:white;
+            border-radius:10px;
+            width:100%;
+            font-size:16px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        button:hover{
+            background:#145a32;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>🎯 Ready for Quiz?</h2>
+    <p>Click below to start your test</p>
+
+    <form action="/quiz" method="GET">
+        <button type="submit">Start Quiz</button>
+    </form>
+</div>
+
+</body>
+</html>

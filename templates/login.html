@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial;
+    background:url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5') no-repeat center/cover;
+}
+
+.card{
+    background:rgba(0,0,0,0.6);
+    padding:30px;
+    width:320px;
+    border-radius:15px;
+    color:white;
+    backdrop-filter:blur(10px);
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:none;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#00c6ff;
+    border:none;
+    color:white;
+    border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+    <h2>🔐 Login</h2>
+    <form method="POST">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <button>Login</button>
+    </form>
+</div>
+</body>
+</html>

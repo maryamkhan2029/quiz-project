@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quiz</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background: linear-gradient(135deg,#1f1c2c,#928dab);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.card{
+    background:white;
+    width:500px;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.3);
+}
+
+.progress-text{
+    font-size:14px;
+    margin-bottom:5px;
+    color:#555;
+}
+
+.progress-bar{
+    width:100%;
+    height:8px;
+    background:#eee;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.progress-fill{
+    height:8px;
+    width:0%;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    border-radius:10px;
+}
+
+.question{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    padding:10px;
+    margin:8px 0;
+    border:1px solid #ddd;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.option:hover{
+    background:#f0f0ff;
+}
+
+.buttons{
+    display:flex;
+    justify-content:space-between;
+    margin-top:15px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    color:white;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<form method="POST" action="/submit">
+
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div id="quizBox"></div>
+
+    <div class="buttons">
+        <button type="button" onclick="prev()">Previous</button>
+        <button type="button" onclick="next()">Next</button>
+    </div>
+
+    <br>
+
+    <button type="submit" onclick="prepareSubmit()" style="width:100%;">
+        Submit Quiz
+    </button>
+
+</form>
+
+</div>
+
+<script>
+
+let questions = {{ questions|tojson }};
+let index = 0;
+let answers = {};
+
+let warningCount = 0;
+let quizSubmitted = false;
+
+/* =========================
+   ANTI CHEAT (FIXED)
+========================= */
+document.addEventListener("visibilitychange", function () {
+
+    if (quizSubmitted) return;   // STOP AFTER SUBMIT
+
+    if (document.hidden) {
+        warningCount++;
+        alert("⚠️ Warning! Do not switch tabs during quiz.");
+    }
+});
+
+/* =========================
+   SHOW QUESTION
+========================= */
+function showQuestion(){
+
+    let q = questions[index];
+
+    document.getElementById("progressText").innerHTML =
+        "Question " + (index+1) + " of " + questions.length;
+
+    let progress = ((index+1)/questions.length)*100;
+    document.getElementById("progressFill").style.width = progress + "%";
+
+    document.getElementById("quizBox").innerHTML = `
+        <div class="question">${q[1]}</div>
+
+        <label class="option">
+            <input type="radio" name="opt" value="${q[2]}" onchange="saveAnswer(this.value)">
+            ${q[2]}
+        </label>
+
+        <label class="option">
+            <input type="radio" name="opt" value="${q[3]}" onchange="saveAnswer(this.value)">
+            ${q[3]}
+        </label>
+
+        <label class="option">
+            <input type="radio" name="opt" value="${q[4]}" onchange="saveAnswer(this.value)">
+            ${q[4]}
+        </label>
+
+        <label class="option">
+            <input type="radio" name="opt" value="${q[5]}" onchange="saveAnswer(this.value)">
+            ${q[5]}
+        </label>
+    `;
+
+    if(answers[index]){
+        let inputs = document.getElementsByName("opt");
+        inputs.forEach(i=>{
+            if(i.value == answers[index]){
+                i.checked = true;
+            }
+        });
+    }
+}
+
+/* =========================
+   SAVE ANSWER
+========================= */
+function saveAnswer(value){
+    answers[index] = value;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+function next(){
+    if(index < questions.length-1){
+        index++;
+        showQuestion();
+    }
+}
+
+function prev(){
+    if(index > 0){
+        index--;
+        showQuestion();
+    }
+}
+
+/* =========================
+   SUBMIT FIX (IMPORTANT)
+========================= */
+function prepareSubmit(){
+
+    quizSubmitted = true;  // ⭐ STOP ANTI-CHEAT
+
+    let form = document.querySelector("form");
+
+    for(let i in answers){
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = i;
+        input.value = answers[i];
+        form.appendChild(input);
+    }
+}
+
+showQuestion();
+
+</script>
+
+</body>
+</html>
